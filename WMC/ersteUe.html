@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Über Mich</title>
-    <link rel="stylesheet" href = "CSSersteUe.css">
-
+    <link rel="stylesheet" href="CSSersteUe.css">
+    <style>
+    
+    </style>
 </head>
 <body>
 
@@ -20,35 +22,126 @@
         </nav>
     </header>
 
-    <section id="about">
-        <h2>Über Mich</h2>
-        <p>Hallo! Ich bin Paygham.</p>
-        <img src="Paygham.png" alt="Mein Bild">
-    </section>
+    <main>
+        <section id="about">
+            <div class="section-content">
+                <h2>Über Mich</h2>
+                <p>Hallo! Ich bin Paygham.</p>
+                <p class="quote">"Das Leben ist eine Reise, genieße jeden Schritt."</p>
+               
+            </div>
+        </section>
 
-    <section id="interests">
-        <h2>Meine Interessen</h2>
-        <ul>
-            <li>nichts</li>
-            <li> Chillen</li>
-            <li> und Chillen </li>
-        </ul>
-    </section>
+        <section id="interests">
+            <div class="section-content">
+                <h2>Meine Interessen</h2>
+                <ul>
+                    <li>Reisen und neue Kulturen entdecken</li>
+                    <li>Cricket spielen</li>
+                    <li>Programieren und neue Technologie entdecken</li>
+                </ul>
+            </div>
+        </section>
 
-    <section id="resume">
-        <h2>Lebenslauf</h2>
-        <h3>Bildung</h3>
-        <p>Hochbau an HTL Bautechnikum, 2024</p>
-        <h3>Berufserfahrung</h3>
-        <p>keine</p>
-    </section>
+        <section id="resume">
+            <div class="section-content">
+                <h2>Lebenslauf</h2>
+				<p> folgt demnächst</p>
+                <h3>Bildung</h3>
+                <p>Hochbau an HTL Bautechnikum, 2024</p>
+                <h3>Berufserfahrung</h3>
+				
+                <p>folgt demnächst</p>
+            </div>
+        </section>
 
-    <section id="gallery">
-        <h2>Fotos</h2>
-        <div class="gallery">
-            <img src="Paygham.png" alt="Bild 1">
+        <section id="gallery">
+            <div class="section-content">
+                <h2>Fotos</h2>
+                <div class="gallery">
+					 <img src="pic2.jpg" alt="pic3">
+                    <img src="Paygham.png" alt="Bild 1">
+                    <img src="pic3.jpg" alt="pic3">
+                
+                </div>
+            </div>
+        </section>
+
+        <section id="skills">
+            <div class="section-content">
+                <h2>Fähigkeiten</h2>
+                <div class="skills">
+                    <div>
+                        <h3>HTML & CSS</h3>
+                        <p>Erstellen von modernen und responsiven Webseiten.</p>
+                    </div>
+                    <div>
+                        <h3>JavaScript</h3>
+                        <p>Interaktive Webanwendungen und dynamische Inhalte.</p>
+                    </div>
+					
+					<div>
+					
+                <h3>Netzwerktechnik</h3>
+                <p>Verständnis von Netzwerkprotokollen, Konfiguration von Routern und Switches, sowie Fehlerbehebung in Netzwerken.</p>
+            </div>
+					
+                </div>
+            </div>
+        </section>
+
+        <section id="projects">
+            <div class="section-content">
+                <h2>Projekte</h2>
+                <div class="projects">
+                    <div>
+                        <h3>Portfolio-Webseite</h3>
+                        <p>Eine Webseite, die meine Fähigkeiten und Projekte präsentiert.</p>
+                    </div>
+                    <div>
+                        <h3>Immobilien-Webseite</h3>
+                        <p>Eine Plattform für Immobilienangebote mit Benutzerregistrierung.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="table">
+            <div class="table-container">
+                <h2>Zeittafel</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Jahr</th>
+                            <th>Ereignis</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        <tr>
+                            <td>2024</td>
+                            <td>Abschluss an der HTL</td>
+                        </tr>
+						
+						<tr>
+                            <td>2024 </td>
+                            <td>Studium Beginn HTL Spengergasse IT</td>
+                        </tr>
+						
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <div class="cta">
+            <a href="#contact">Kontaktieren Sie mich</a>
         </div>
-    </section>
+    </main>
 
+    <footer>
+        <p>&copy; 2024 Paygham. Alle Rechte vorbehalten.</p>
+    </footer>
+
+    <button class="scroll-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'});">↑</button>
 </body>
 </html>
