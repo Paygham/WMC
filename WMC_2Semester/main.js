@@ -4,7 +4,7 @@ import { serveStatic } from "hono/deno";
 const app = new Hono();
 
 // serve index.html
-app.get("/", serveStatic({ path: "./static/index.html" }));
+app.get("/", serveStatic({ path: "./WMC_2Semester/isPrime.html" }));
 
 // serve json
 const arr = [1, 2, 3, 4, 5];
@@ -22,6 +22,6 @@ app.get(
 );
 
 // serve all other static files
-app.get("*", serveStatic({ root: "./static" }));
+app.get("*", serveStatic({ root: "./WMC_2Semester" }));
 
 Deno.serve(app.fetch);
