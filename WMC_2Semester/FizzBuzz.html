@@ -2,39 +2,106 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <title>FizzBuzz Eingabe</title>
+  <title>FizzBuzz Generator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f9f9f9;
-      padding: 30px;
-      text-align: center;
+      font-family: "Segoe UI", sans-serif;
+      background: #e0f7fa;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      margin: 0;
     }
-    input, button {
+
+    h1 {
+      color: #00796b;
+      margin-bottom: 10px;
+    }
+
+    p {
+      margin-top: 0;
+      color: #555;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    input[type="number"] {
       padding: 10px;
       font-size: 16px;
-      margin: 10px;
+      width: 200px;
+      border: 2px solid #00796b;
+      border-radius: 8px;
     }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #00796b;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #004d40;
+    }
+
     #output {
-      margin-top: 20px;
+      margin-top: 30px;
+      background-color: #ffffff;
+      padding: 20px;
+      width: 100%;
+      max-width: 400px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
       white-space: pre-line;
       text-align: left;
-      max-width: 400px;
-      margin-left: auto;
-      margin-right: auto;
-      background-color: #fff;
-      padding: 15px;
-      border-radius: 5px;
-      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+
+    .line {
+      margin: 4px 0;
+      font-size: 16px;
+    }
+
+    .fizz {
+      color: #fb8c00;
+      font-weight: bold;
+    }
+
+    .buzz {
+      color: #1e88e5;
+      font-weight: bold;
+    }
+
+    .fizzbuzz {
+      color: #43a047;
+      font-weight: bold;
+    }
+
+    .zahl {
+      color: #666;
     }
   </style>
 </head>
 <body>
 
   <h1>FizzBuzz Generator</h1>
-  <p>Gib eine Zahl ein:</p>
-  <input type="number" id="zahl" placeholder="z. B. 30" min="1" />
-  <button onclick="fizzBuzzStarten()">Start</button>
+  <p>Gib eine Zahl ein, um das Spiel zu starten</p>
+
+  <div class="input-group">
+    <input type="number" id="zahl" placeholder="z. B. 30" min="1" />
+    <button onclick="fizzBuzzStarten()">Start</button>
+  </div>
 
   <div id="output"></div>
 
@@ -43,25 +110,32 @@
       const eingabe = document.getElementById("zahl").value;
       const max = parseInt(eingabe);
       const ausgabe = document.getElementById("output");
-      ausgabe.innerText = ""; // Ausgabe leeren
+      ausgabe.innerHTML = ""; // Ausgabe leeren
 
       if (isNaN(max) || max < 1) {
-        ausgabe.innerText = "Bitte gib eine gültige Zahl größer als 0 ein.";
+        ausgabe.innerHTML = "<span class='line zahl'>Bitte gib eine gültige Zahl größer als 0 ein.</span>";
         return;
       }
 
       for (let i = 1; i <= max; i++) {
-        let text = "";
+        let span = document.createElement("div");
+        span.classList.add("line");
+
         if (i % 3 === 0 && i % 5 === 0) {
-          text = "FizzBuzz";
+          span.textContent = "FizzBuzz";
+          span.classList.add("fizzbuzz");
         } else if (i % 3 === 0) {
-          text = "Fizz";
+          span.textContent = "Fizz";
+          span.classList.add("fizz");
         } else if (i % 5 === 0) {
-          text = "Buzz";
+          span.textContent = "Buzz";
+          span.classList.add("buzz");
         } else {
-          text = i;
+          span.textContent = i;
+          span.classList.add("zahl");
         }
-        ausgabe.innerText += text + "\n";
+
+        ausgabe.appendChild(span);
       }
     }
   </script>
