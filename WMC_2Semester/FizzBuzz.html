@@ -2,73 +2,67 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FizzBuzz</title>
+  <title>FizzBuzz Eingabe</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #f2f2f2;
-      padding: 20px;
+      background: #f9f9f9;
+      padding: 30px;
       text-align: center;
     }
-    h1 {
-      color: #333;
-    }
-    .output {
-      margin-top: 20px;
-    }
-    .item {
-      margin: 5px;
+    input, button {
       padding: 10px;
-      border-radius: 5px;
+      font-size: 16px;
+      margin: 10px;
+    }
+    #output {
+      margin-top: 20px;
+      white-space: pre-line;
+      text-align: left;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
       background-color: #fff;
-      display: inline-block;
-      width: 80px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
-    }
-    .fizz {
-      color: #ff6600;
-      font-weight: bold;
-    }
-    .buzz {
-      color: #0066cc;
-      font-weight: bold;
-    }
-    .fizzbuzz {
-      color: #00aa00;
-      font-weight: bold;
+      padding: 15px;
+      border-radius: 5px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
     }
   </style>
 </head>
 <body>
 
-  <h1>FizzBuzz von 0 bis 100</h1>
-  <div class="output" id="output"></div>
+  <h1>FizzBuzz Generator</h1>
+  <p>Gib eine Zahl ein:</p>
+  <input type="number" id="zahl" placeholder="z. B. 30" min="1" />
+  <button onclick="fizzBuzzStarten()">Start</button>
+
+  <div id="output"></div>
 
   <script>
-    const outputDiv = document.getElementById("output");
+    function fizzBuzzStarten() {
+      const eingabe = document.getElementById("zahl").value;
+      const max = parseInt(eingabe);
+      const ausgabe = document.getElementById("output");
+      ausgabe.innerText = ""; // Ausgabe leeren
 
-    for (let i = 0; i <= 100; i++) {
-      let text = "";
-      let cssClass = "";
-
-      if (i % 3 === 0 && i % 5 === 0) {
-        text = "FizzBuzz";
-        cssClass = "fizzbuzz";
-      } else if (i % 3 === 0) {
-        text = "Fizz";
-        cssClass = "fizz";
-      } else if (i % 5 === 0) {
-        text = "Buzz";
-        cssClass = "buzz";
-      } else {
-        text = i;
+      if (isNaN(max) || max < 1) {
+        ausgabe.innerText = "Bitte gib eine gültige Zahl größer als 0 ein.";
+        return;
       }
 
-      const div = document.createElement("div");
-      div.className = "item " + cssClass;
-      div.textContent = text;
-      outputDiv.appendChild(div);
+      for (let i = 1; i <= max; i++) {
+        let text = "";
+        if (i % 3 === 0 && i % 5 === 0) {
+          text = "FizzBuzz";
+        } else if (i % 3 === 0) {
+          text = "Fizz";
+        } else if (i % 5 === 0) {
+          text = "Buzz";
+        } else {
+          text = i;
+        }
+        ausgabe.innerText += text + "\n";
+      }
     }
   </script>
 
