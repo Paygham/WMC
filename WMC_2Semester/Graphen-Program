@@ -1,1 +1,244 @@
+<!DOCTYPE html> <!-- Dokumenttyp: HTML5 -->
+<html lang="de"> <!-- Dokumentensprache: Deutsch -->
+<head>
+  <meta charset="UTF-8" /> <!-- Zeichensatz (UTF-8) festlegen -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/> <!-- Responsives Design aktivieren -->
+  <title>Dijkstra Demo mit Visualisierung</title> <!-- Seitentitel -->
+  <style>
+    /* --- Grundlegendes Layout --- */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    header, footer {
+      background: #333;
+      color: #fff;
+      padding: 1rem;
+      text-align: center;
+    }
+    main {
+      flex: 1;
+      display: flex;
+      flex-wrap: wrap;
+      padding: 1rem;
+    }
+
+    /* --- Eingabe/Ausgabe --- */
+    #controls, #output {
+      flex: 1 1 300px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      border-radius: 0.5rem;
+      padding: 1rem;
+      margin: 0.5rem;
+      display: flex;
+      flex-direction: column;
+    }
+    #controls h2, #output h2 {
+      margin-top: 0;
+    }
+    textarea {
+      width: 100%;
+      height: 150px;
+      font-family: monospace;
+    }
+    .input-group {
+      margin-top: 0.5rem;
+    }
+    button {
+      padding: 0.5rem 1rem;
+      margin: 0.5rem 0 0 0;
+      border: none;
+      border-radius: 0.25rem;
+      background: #0066cc;
+      color: #fff;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #005bb5;
+    }
+
+    /* --- Visualisierung --- */
+    #network {
+      flex: 2 1 600px;
+      height: 500px;
+      margin: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 0.5rem;
+    }
+
+    /* --- Responsive --- */
+    @media (max-width: 800px) {
+      main { flex-direction: column; }
+      #network { height: 300px; }
+    }
+  </style>
+  <!-- vis-network Bibliothek von CDN einbinden -->
+  <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Dijkstra Algorithmus Demo mit Graph-Visualisierung</h1>
+  </header>
+  <main>
+    <section id="controls">
+      <h2>Graph definieren</h2>
+      <p>Gib den Graph als Adjazenzliste ein oder erzeuge einen zufälligen:</p>
+      <pre>
+Beispiel-Format:
+{
+  A: { B: 5, C: 2 },
+  ...
+}
+      </pre>
+      <textarea id="graphInput">{
+  A: { B: 5, C: 2 },
+  B: { A: 5, D: 1 },
+  C: { A: 2, D: 7 },
+  D: { B: 1, C: 7, E: 3 },
+  E: { D: 3 }
+}</textarea>
+      <div class="input-group">Startknoten: <input type="text" id="startNode" value="A" size="2" /></div>
+      <div class="input-group">Zielknoten: <input type="text" id="endNode" value="E" size="2" /></div>
+      <!-- Buttons ans Ende verschoben -->
+      <button id="newGraphBtn">Neuer Graph</button>
+      <button id="runBtn">Dijkstra ausführen</button>
+    </section>
+    <section id="output">
+      <h2>Ergebnis</h2>
+      <div id="result">Noch keine Berechnung gestartet.</div>
+    </section>
+    <div id="network"></div>
+  </main>
+  <footer>
+    &copy; Sommersemester 2425
+  </footer>
+
+  <script>
+    // Dijkstra-Algorithmus
+    function dijkstra(graph, start, end) {
+      const distances = {};
+      const prev = {};
+      const pq = new Set();
+      for (const node in graph) {
+        distances[node] = Infinity;
+        prev[node] = null;
+        pq.add(node);
+      }
+      distances[start] = 0;
+      while (pq.size) {
+        let u = null;
+        for (const node of pq) if (u === null || distances[node] < distances[u]) u = node;
+        pq.delete(u);
+        if (u === end) break;
+        for (const [nei, w] of Object.entries(graph[u] || {})) {
+          const alt = distances[u] + w;
+          if (alt < distances[nei]) {
+            distances[nei] = alt;
+            prev[nei] = u;
+          }
+        }
+      }
+      const path = [];
+      let uNode = end;
+      if (prev[uNode] !== null || uNode === start) {
+        while (uNode) {
+          path.unshift(uNode);
+          uNode = prev[uNode];
+        }
+      }
+      return { distance: distances[end], path };
+    }
+
+    // Graph zeichnen
+    function drawGraph(graph, shortestPath) {
+      const nodes = [], edges = [], seen = new Set();
+      for (const key of Object.keys(graph)) {
+        nodes.push({ id: key, label: key, color: shortestPath.includes(key) ? '#ffd54f' : undefined });
+      }
+      for (const [u, nbrs] of Object.entries(graph)) {
+        for (const [v, w] of Object.entries(nbrs)) {
+          const id = [u, v].sort().join('-');
+          if (!seen.has(id)) {
+            seen.add(id);
+            edges.push({ from: u, to: v, label: w.toString(), arrows: '' });
+          }
+        }
+      }
+      const container = document.getElementById('network');
+      const data = { nodes: new vis.DataSet(nodes), edges: new vis.DataSet(edges) };
+      const options = { physics: { stabilization: false } };
+      new vis.Network(container, data, options);
+    }
+
+    // Zufälligen Graph erstellen (weniger Kanten)
+    function generateRandomGraph() {
+      const num = Math.floor(Math.random() * 11) + 10; // 10-20 Knoten
+      const labels = [];
+      for (let i = 0; i < num; i++) labels.push(String.fromCharCode(65 + i));
+      const graph = {};
+      labels.forEach(l => graph[l] = {});
+      labels.forEach(u => {
+        labels.forEach(v => {
+          if (u < v && Math.random() < 0.15) {
+            const w = Math.floor(Math.random() * 9) + 1;
+            graph[u][v] = w;
+            graph[v][u] = w;
+          }
+        });
+      });
+      return graph;
+    }
+
+    // Graph-Objekt in Text umwandeln
+    function graphToString(graph) {
+      let str = '{\n';
+      for (const u of Object.keys(graph)) {
+        const neigh = graph[u];
+        const parts = Object.entries(neigh).map(([v,w]) => ` ${v}: ${w}`);
+        str += `  ${u}: {${parts.join(', ')} },\n`;
+      }
+      return str + '}';
+    }
+
+    // Event-Listener für Buttons
+    document.getElementById('newGraphBtn').addEventListener('click', () => {
+      const g = generateRandomGraph();
+      document.getElementById('graphInput').value = graphToString(g);
+      const nodes = Object.keys(g);
+      document.getElementById('startNode').value = nodes[0];
+      document.getElementById('endNode').value = nodes[nodes.length-1];
+      drawGraph(g, []);
+      document.getElementById('result').innerText = 'Neuer zufälliger Graph erzeugt.';
+    });
+
+    document.getElementById('runBtn').addEventListener('click', () => {
+      let graph;
+      try {
+        graph = eval('(' + document.getElementById('graphInput').value + ')');
+      } catch {
+        document.getElementById('result').innerText = 'Ungültiges Graph-Format!';
+        return;
+      }
+      const start = document.getElementById('startNode').value.trim();
+      const end = document.getElementById('endNode').value.trim();
+      if (!(start in graph) || !(end in graph)) {
+        document.getElementById('result').innerText = 'Start- oder Zielknoten nicht gefunden!';
+        return;
+      }
+      const { distance, path } = dijkstra(graph, start, end);
+      if (distance === Infinity) {
+        document.getElementById('result').innerText = 'Kein Pfad gefunden.';
+      } else {
+        document.getElementById('result').innerHTML =
+          `<p>kürzeste Distanz: <strong>${distance}</strong></p>` +
+          `<p>Pfad: <strong>${path.join(' → ')}</strong></p>`;
+      }
+      drawGraph(graph, path);
+    });
+  </script>
+</body>
+</html>
 
