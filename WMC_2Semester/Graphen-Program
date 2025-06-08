@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" /> <!-- Zeichensatz (UTF-8) festlegen -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/> <!-- Responsives Design aktivieren -->
-  <title>Dijkstra Demo mit Visualisierung</title> <!-- Seitentitel -->
+  <title>Dijkstra Demo mit Visualisierung und CSV-Import/Export</title> <!-- Seitentitel -->
   <style>
     /* --- Grundlegendes Layout --- */
     body {
@@ -80,7 +80,7 @@
 </head>
 <body>
   <header>
-    <h1>Dijkstra Algorithmus Demo mit Graph-Visualisierung</h1>
+    <h1>Dijkstra Algorithmus Demo mit Graph-Visualisierung und CSV-Import/Export</h1>
   </header>
   <main>
     <section id="controls">
@@ -102,9 +102,12 @@ Beispiel-Format:
 }</textarea>
       <div class="input-group">Startknoten: <input type="text" id="startNode" value="A" size="2" /></div>
       <div class="input-group">Zielknoten: <input type="text" id="endNode" value="E" size="2" /></div>
-      <!-- Buttons ans Ende verschoben -->
+      <!-- Buttons und Upload-Input -->
       <button id="newGraphBtn">Neuer Graph</button>
       <button id="runBtn">Dijkstra ausführen</button>
+      <button id="downloadCsvBtn">CSV herunterladen</button>
+      <button id="uploadCsvBtn">CSV hochladen</button>
+      <input type="file" id="uploadCsvInput" accept=".csv" style="display:none" />
     </section>
     <section id="output">
       <h2>Ergebnis</h2>
@@ -203,11 +206,47 @@ Beispiel-Format:
       return str + '}';
     }
 
+    // Graph-Objekt in CSV umwandeln: Header + jede Zeile "u,v,w"
+    function graphToCsv(graph) {
+      const lines = ['source,target,weight'];
+      const seen = new Set();
+      for (const [u, nbrs] of Object.entries(graph)) {
+        for (const [v, w] of Object.entries(nbrs)) {
+          // nur jede ungerichtete Kante einmal
+          const key = [u, v].sort().join('-');
+          if (!seen.has(key)) {
+            seen.add(key);
+            lines.push(`${u},${v},${w}`);
+          }
+        }
+      }
+      return lines.join('\n');
+    }
+
+    // CSV-Inhalt in Graph-Objekt umwandeln
+    function csvToGraph(csvText) {
+      const lines = csvText.trim().split(/\r?\n/);
+      const graph = {};
+      // Header überspringen (erste Zeile: source,target,weight)
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+        const [u, v, wStr] = line.split(',');
+        const weight = parseFloat(wStr);
+        if (isNaN(weight)) continue;
+        if (!(u in graph)) graph[u] = {};
+        if (!(v in graph)) graph[v] = {};
+        graph[u][v] = weight;
+        graph[v][u] = weight;
+      }
+      return graph;
+    }
+
     // Event-Listener für Buttons
     document.getElementById('newGraphBtn').addEventListener('click', () => {
       const g = generateRandomGraph();
       document.getElementById('graphInput').value = graphToString(g);
-      const nodes = Object.keys(g);
+      const nodes = Object.keys(g).sort();
       document.getElementById('startNode').value = nodes[0];
       document.getElementById('endNode').value = nodes[nodes.length-1];
       drawGraph(g, []);
@@ -238,7 +277,62 @@ Beispiel-Format:
       }
       drawGraph(graph, path);
     });
+
+    // CSV herunterladen
+    document.getElementById('downloadCsvBtn').addEventListener('click', () => {
+      let graph;
+      try {
+        graph = eval('(' + document.getElementById('graphInput').value + ')');
+      } catch {
+        alert('Ungültiges Graph-Format! Kann keine CSV generieren.');
+        return;
+      }
+      const csvContent = graphToCsv(graph);
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'graph.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+
+    // CSV hochladen: Datei-Input auslösen
+    document.getElementById('uploadCsvBtn').addEventListener('click', () => {
+      document.getElementById('uploadCsvInput').click();
+    });
+
+    // Sobald eine Datei ausgewählt wurde, einlesen und Graph erzeugen
+    document.getElementById('uploadCsvInput').addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const text = e.target.result;
+        let graph;
+        try {
+          graph = csvToGraph(text);
+        } catch {
+          alert('Fehler beim Einlesen der CSV-Datei!');
+          return;
+        }
+        // Graph im Textfeld aktualisieren
+        document.getElementById('graphInput').value = graphToString(graph);
+        // Start- und Endknoten automatisch setzen
+        const nodes = Object.keys(graph).sort();
+        if (nodes.length > 0) {
+          document.getElementById('startNode').value = nodes[0];
+          document.getElementById('endNode').value = nodes[nodes.length-1];
+        }
+        drawGraph(graph, []);
+        document.getElementById('result').innerText = 'Graph aus CSV geladen.';
+      };
+      reader.readAsText(file);
+      // Input zurücksetzen, damit bei gleichem Dateinamen erneut change ausgelöst wird
+      event.target.value = '';
+    });
   </script>
 </body>
 </html>
-
